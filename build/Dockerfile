@@ -7,14 +7,15 @@ ARG commit
 RUN yum install -y rpm-build make
 
 # default git has problems while cloning some repository
-RUN yum install -y https://repo.ius.io/ius-release-el7.rpm \
-  && yum install -y git222
+RUN curl https://setup.ius.io | sh \
+  && yum install -y git236-all.noarch
 
 ENV GOLANG_VERSION 1.14.3
 RUN curl -sSL https://dl.google.com/go/go${GOLANG_VERSION}.linux-amd64.tar.gz \
     | tar -C /usr/local -xz
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+RUN go env -w GOPROXY=https://goproxy.cn,direct
 
 RUN mkdir -p /root/rpmbuild/{SPECS,SOURCES}
 
