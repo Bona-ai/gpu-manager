@@ -73,6 +73,7 @@ func NewContainerRuntimeManager(cgroupDriver, endpoint string, requestTimeout ti
 }
 
 func (m *containerRuntimeManager) GetPidsInContainers(containerID string) ([]int, error) {
+	containerID = strings.TrimPrefix(containerID, "containerd-")
 	req := &criapi.ContainerStatusRequest{
 		ContainerId: containerID,
 	}
@@ -174,6 +175,7 @@ func (m *containerRuntimeManager) getCgroupName(pod *v1.Pod, containerID string)
 }
 
 func (m *containerRuntimeManager) InspectContainer(containerID string) (*criapi.ContainerStatus, error) {
+	containerID = strings.TrimPrefix(containerID, "containerd-")
 	req := &criapi.ContainerStatusRequest{
 		ContainerId: containerID,
 	}
