@@ -459,10 +459,10 @@ func (ta *NvidiaTopoAllocator) allocateOne(pod *v1.Pod, container *v1.Container,
 				}
 
 				// check if we choose the same node as scheduler
-				if predicateNode.MinorName() != nodes[0].MinorName() {
-					return nil, fmt.Errorf("Nvidia node mismatch for pod %s(%s), pick up:%s  predicate: %s",
-						pod.Name, container.Name, nodes[0].MinorName(), predicateNode.MinorName())
-				}
+				//if predicateNode.MinorName() != nodes[0].MinorName() {
+				//	return nil, fmt.Errorf("Nvidia node mismatch for pod %s(%s), pick up:%s  predicate: %s",
+				//		pod.Name, container.Name, nodes[0].MinorName(), predicateNode.MinorName())
+				//}
 			}
 		}
 	}
