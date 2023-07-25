@@ -44,7 +44,7 @@ function plugin::generate_img() {
   readonly local commit=$(git log --no-merges --oneline | wc -l | sed -e 's,^[ \t]*,,')
   readonly local version=$(<"${ROOT}/VERSION")
 
-  readonly local base_img=${BASE_IMG:-"harbor-hz.zeekrlife.com/kubeflow/vcuda-control:v1.0"}
+  readonly local base_img=${BASE_IMG:-"thomassong/vcuda:1.0.4"}
   echo $base_img
   mkdir -p "${ROOT}/go/build"
   tar czf "${ROOT}/go/build/gpu-manager-source.tar.gz" --transform 's,^,/gpu-manager-'${version}'/,' $(plugin::source_targets)
