@@ -27,11 +27,11 @@ import (
 	"unsafe"
 )
 
-const ldcachePath = "/etc/ld.so.cache"
+const ldcachePath = "/etc/ld.so.scheduler"
 
 const (
 	magicString1 = "ld.so-1.7.0"
-	magicString2 = "glibc-ld.so.cache"
+	magicString2 = "glibc-ld.so.scheduler"
 	magicVersion = "1.1"
 )
 
@@ -46,7 +46,7 @@ const (
 	flagArchPpc64le = 0x0500
 )
 
-var ErrInvalidCache = errors.New("invalid ld.so.cache file")
+var ErrInvalidCache = errors.New("invalid ld.so.scheduler file")
 
 type Header1 struct {
 	Magic [len(magicString1) + 1]byte // include null delimiter

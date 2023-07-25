@@ -64,7 +64,7 @@ func init() {
 	allocator.Register("nvidia_test", NewNvidiaTopoAllocatorForTest)
 }
 
-//NvidiaTopoAllocator is an allocator for Nvidia GPU
+// NvidiaTopoAllocator is an allocator for Nvidia GPU
 type NvidiaTopoAllocator struct {
 	sync.Mutex
 
@@ -101,7 +101,7 @@ var (
 	waitTimeout                          = 10 * time.Second
 )
 
-//NewNvidiaTopoAllocator returns a new NvidiaTopoAllocator
+// NewNvidiaTopoAllocator returns a new NvidiaTopoAllocator
 func NewNvidiaTopoAllocator(config *config.Config,
 	tree device.GPUTree,
 	k8sClient kubernetes.Interface,
@@ -145,8 +145,8 @@ func NewNvidiaTopoAllocator(config *config.Config,
 	return alloc
 }
 
-//NewNvidiaTopoAllocatorForTest returns a new NvidiaTopoAllocator
-//with fake docker client, just for testing.
+// NewNvidiaTopoAllocatorForTest returns a new NvidiaTopoAllocator
+// with fake docker client, just for testing.
 func NewNvidiaTopoAllocatorForTest(config *config.Config,
 	tree device.GPUTree,
 	k8sClient kubernetes.Interface,
@@ -659,7 +659,7 @@ func (ta *NvidiaTopoAllocator) freeGPU(podUids []string) {
 }
 
 // #lizard forgives
-//Allocate tries to allocate GPU node for each request
+// Allocate tries to allocate GPU node for each request
 func (ta *NvidiaTopoAllocator) Allocate(_ context.Context, reqs *pluginapi.AllocateRequest) (*pluginapi.AllocateResponse, error) {
 	ta.Lock()
 	defer ta.Unlock()
@@ -687,7 +687,7 @@ func (ta *NvidiaTopoAllocator) Allocate(_ context.Context, reqs *pluginapi.Alloc
 		candidatePod = ta.unfinishedPod
 		cache := ta.allocatedPod.GetCache(string(candidatePod.UID))
 		if cache == nil {
-			msg := fmt.Sprintf("failed to find pod %s in cache", candidatePod.UID)
+			msg := fmt.Sprintf("failed to find pod %s in scheduler", candidatePod.UID)
 			klog.Infof(msg)
 			return nil, fmt.Errorf(msg)
 		}
@@ -767,12 +767,12 @@ func (ta *NvidiaTopoAllocator) Allocate(_ context.Context, reqs *pluginapi.Alloc
 	return resps, nil
 }
 
-//ListAndWatch is not implement
+// ListAndWatch is not implement
 func (ta *NvidiaTopoAllocator) ListAndWatch(e *pluginapi.Empty, s pluginapi.DevicePlugin_ListAndWatchServer) error {
 	return fmt.Errorf("not implement")
 }
 
-//ListAndWatchWithResourceName send devices for request resource back to server
+// ListAndWatchWithResourceName send devices for request resource back to server
 func (ta *NvidiaTopoAllocator) ListAndWatchWithResourceName(resourceName string, e *pluginapi.Empty, s pluginapi.DevicePlugin_ListAndWatchServer) error {
 	devs := make([]*pluginapi.Device, 0)
 	for _, dev := range ta.capacity() {
@@ -793,14 +793,14 @@ func (ta *NvidiaTopoAllocator) ListAndWatchWithResourceName(resourceName string,
 	return nil
 }
 
-//GetDevicePluginOptions returns empty DevicePluginOptions
+// GetDevicePluginOptions returns empty DevicePluginOptions
 func (ta *NvidiaTopoAllocator) GetDevicePluginOptions(ctx context.Context, e *pluginapi.Empty) (*pluginapi.DevicePluginOptions, error) {
 	return &pluginapi.DevicePluginOptions{PreStartRequired: true}, nil
 }
 
-//PreStartContainer find the podUID by comparing request deviceids with deviceplugin
-//checkpoint data, then checks the validation of allocation of the pod.
-//Update pod annotation if check success, otherwise evict the pod.
+// PreStartContainer find the podUID by comparing request deviceids with deviceplugin
+// checkpoint data, then checks the validation of allocation of the pod.
+// Update pod annotation if check success, otherwise evict the pod.
 func (ta *NvidiaTopoAllocator) PreStartContainer(ctx context.Context, req *pluginapi.PreStartContainerRequest) (*pluginapi.PreStartContainerResponse, error) {
 	ta.Lock()
 	defer ta.Unlock()
@@ -888,20 +888,20 @@ func (ta *NvidiaTopoAllocator) PreStartContainer(ctx context.Context, req *plugi
 func (ta *NvidiaTopoAllocator) preStartContainerCheck(podUID string, containerName string, vcore int64, vmemory int64) error {
 	cache := ta.allocatedPod.GetCache(podUID)
 	if cache == nil {
-		msg := fmt.Sprintf("%s, failed to get pod %s from allocatedPod cache",
+		msg := fmt.Sprintf("%s, failed to get pod %s from allocatedPod scheduler",
 			types.PreStartContainerCheckErrMsg, podUID)
 		klog.Infof(msg)
 		return fmt.Errorf(msg)
 	}
 
 	if c, ok := cache[containerName]; !ok {
-		msg := fmt.Sprintf("%s, failed to get container %s of pod %s from allocatedPod cache",
+		msg := fmt.Sprintf("%s, failed to get container %s of pod %s from allocatedPod scheduler",
 			types.PreStartContainerCheckErrMsg, containerName, podUID)
 		klog.Infof(msg)
 		return fmt.Errorf(msg)
 	} else if c.Memory != vmemory*types.MemoryBlockSize || c.Cores != vcore {
-		// request and cache mismatch, evict the pod
-		msg := fmt.Sprintf("%s, pod %s container %s requset mismatch from cache. req: vcore %d vmemory %d; cache: vcore %d vmemory %d",
+		// request and scheduler mismatch, evict the pod
+		msg := fmt.Sprintf("%s, pod %s container %s requset mismatch from scheduler. req: vcore %d vmemory %d; scheduler: vcore %d vmemory %d",
 			types.PreStartContainerCheckErrMsg, podUID, containerName, vcore, vmemory*types.MemoryBlockSize, c.Cores, c.Memory)
 		klog.Infof(msg)
 		return fmt.Errorf(msg)
@@ -997,7 +997,7 @@ func (ta *NvidiaTopoAllocator) getReadyAnnotations(pod *v1.Pod, assigned bool) (
 	//defer ta.Unlock()
 	cache := ta.allocatedPod.GetCache(string(pod.UID))
 	if cache == nil {
-		msg := fmt.Sprintf("failed to get pod %s from allocatedPod cache", pod.UID)
+		msg := fmt.Sprintf("failed to get pod %s from allocatedPod scheduler", pod.UID)
 		klog.Infof(msg)
 		return nil, fmt.Errorf(msg)
 	}
@@ -1010,7 +1010,7 @@ func (ta *NvidiaTopoAllocator) getReadyAnnotations(pod *v1.Pod, assigned bool) (
 		var devices []string
 		containerCache, ok := cache[c.Name]
 		if !ok {
-			msg := fmt.Sprintf("failed to get container %s of pod %s from allocatedPod cache", c.Name, pod.UID)
+			msg := fmt.Sprintf("failed to get container %s of pod %s from allocatedPod scheduler", c.Name, pod.UID)
 			klog.Infof(msg)
 			err = fmt.Errorf(msg)
 			continue
@@ -1179,8 +1179,8 @@ func getPodsOnNode(client kubernetes.Interface, hostname string, phase string) (
 		podList *v1.PodList
 		err     error
 	)
-
-	err = wait.PollImmediate(time.Second, time.Minute, func() (bool, error) {
+	// TODO 超时原因待定位
+	err = wait.PollImmediate(time.Second, 2*time.Minute, func() (bool, error) {
 		podList, err = client.CoreV1().Pods(v1.NamespaceAll).List(metav1.ListOptions{
 			FieldSelector: selector.String(),
 			LabelSelector: labels.Everything().String(),

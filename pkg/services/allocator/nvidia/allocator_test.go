@@ -322,7 +322,7 @@ GPU5     SOC     SOC     SOC     SOC     PIX      X
 	deleteOption := metav1.DeleteOptions{}
 	k8sClient.CoreV1().Pods("test-ns").Delete(raw2.Name, &deleteOption)
 
-	//wait for watchdog to sync cache
+	//wait for watchdog to sync scheduler
 	time.Sleep(1 * time.Second)
 
 	//create and allocate pod4
@@ -717,7 +717,7 @@ func createAndAllocate(alloc *NvidiaTopoAllocator, client kubernetes.Interface, 
 	if pod == nil {
 		pod = createPod(client, raw)
 	}
-	//wait for watchdog to sync cache
+	//wait for watchdog to sync scheduler
 	time.Sleep(1 * time.Second)
 	resps := &pluginapi.AllocateResponse{}
 	for _, c := range pod.Spec.Containers {
